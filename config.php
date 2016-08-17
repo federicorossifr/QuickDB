@@ -13,6 +13,7 @@
 	}
 
 
+	//Example config intiliaziation
 	Config::conf("dbHost","");
 	Config::conf("dbUser","");
 	Config::conf("dbPass","");

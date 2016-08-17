@@ -11,11 +11,9 @@ class db {
 
 
   function __construct() {
-
-    //example configuration
     $this->connection = new mysqli(Config::read("dbHost"),Config::read("dbUser"),Config::read("dbPass"),Config::read("dbCollection"));
     if(!$this->connection)
-      die("Impossibile contattare il database");
+      die("Cannot contact database, dying");
     else {
       $this->rows = 0;
       $this->errorMessage = "";
@@ -24,12 +22,12 @@ class db {
     }
   }
 
-  function utilityFilter(&$query) {
-    $this->connection->real_escape_string($query);
-    return $query;
+  function stringEscape(&$string) {
+    $this->connection->real_escape_string($string);
+    return $string;
   }
 
-  function query($query,$next = 1) {
+  function query($query) {
 
     $this->result = $this->connection->query($query);
 
@@ -37,22 +35,18 @@ class db {
       $this->result = null;
       $this->error = 1;
       $this->errorMessage = $this->connection->error;
-      die($this->errorMessage);
+      die($this->error());
     } else {
-
       if(isset($this->result->num_rows))
         $this->rows = $this->result->num_rows;
-
       $this->insertedId = $this->connection->insert_id;
       $this->affected = $this->connection->affected_rows;
     }
-
-      return $this->result;
+    return $this->result;
   }
 
   function arrayResult($next = 0)  {
     $response = array();
-
     while($row = $this->result->fetch_assoc()) {
       array_push($response,$row);
     }
@@ -74,7 +68,8 @@ class db {
     $response = array();
     $response['data'] = $this->arrayResult(1);
     $response['length'] = $this->rows;
-    $response['error'] = $this->error()['errorMessage'];
+    $response['error'] = $this->error();
+    $this->end();    
     return json_encode($response);
   }
 
@@ -89,9 +84,6 @@ class db {
   function end() {
     return $this->connection->close();
   }
-
-
-
 }
 
 

@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . "/config.php";
-class db {
+class quickDB {
   protected $connection;
   protected $result;
   protected $error;
@@ -35,41 +35,41 @@ class db {
       $this->result = null;
       $this->error = 1;
       $this->errorMessage = $this->connection->error;
-      die($this->error());
+      echo json_encode($this->error());
+      die();
     } else {
       if(isset($this->result->num_rows))
         $this->rows = $this->result->num_rows;
       $this->insertedId = $this->connection->insert_id;
       $this->affected = $this->connection->affected_rows;
     }
-    return $this->result;
+    return $this;
   }
 
-  function arrayResult($next = 0)  {
+  function toArray($next = 0)  {
     $response = array();
+    if(!$this->rows) return;
     while($row = $this->result->fetch_assoc()) {
       array_push($response,$row);
     }
 
-    $this->result->close();
     if(!$next) {
+      $this->result->close();
       $this->end();
     }
     return $response;
   }
 
-  function JSONResult() {
-    $response = $this->arrayResult(1);
-    $this->end();
-    return json_encode($response);
-  }
 
-  function ExtendedJSONResult() {
+  function toJSON() {
     $response = array();
-    $response['data'] = $this->arrayResult(1);
+    $response['data'] = $this->toArray(1);
     $response['length'] = $this->rows;
+    $response['inserted'] = $this->insertedId;
+    $response['affected'] = $this->affected;
     $response['error'] = $this->error();
-    $this->end();    
+
+    $this->end();
     return json_encode($response);
   }
 
@@ -77,12 +77,11 @@ class db {
     $error = array();
     $error['isError'] = $this->error;
     $error['errorMessage'] = $this->errorMessage;
-    $this->end();
     return $error;
   }
 
   function end() {
-    return $this->connection->close();
+      return $this->connection->close();
   }
 }
 

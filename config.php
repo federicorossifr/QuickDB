@@ -1,5 +1,7 @@
 <?php
 
+	mysqli_report(MYSQLI_REPORT_STRICT); 
+
 	class Config {
 		private static $props;
 
@@ -13,8 +15,11 @@
 	}
 
 
-	//Example config intiliaziation
-	Config::conf("dbHost","");
-	Config::conf("dbUser","");
+	//Example configuration
+	Config::conf("dbHost","localhost"); 
+	Config::conf("dbUser","root");  
 	Config::conf("dbPass","");
-	Config::conf("dbCollection","");
+	Config::conf("dbCollection","experiments"); //Database name
+	Config::conf("displayErrorMessages",0); //1 will display all error messages, 0 will display message below on
+											//error
+	Config::conf("safeErrorMessage","There was an error"); // Error message to display instead of default error 													   // message from mysqli

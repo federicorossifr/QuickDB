@@ -11,15 +11,18 @@ class quickDB {
 
 
   function __construct() {
-    $this->connection = new mysqli(Config::read("dbHost"),Config::read("dbUser"),Config::read("dbPass"),Config::read("dbCollection"));
-    if(!$this->connection)
-      die("Cannot contact database, dying");
-    else {
-      $this->rows = 0;
-      $this->errorMessage = "";
-      $this->error = 0;
-      $this->result = null;
-    }
+  	try {
+    	$this->connection = new mysqli(Config::read("dbHost"),Config::read("dbUser"),Config::read("dbPass"),Config::read("dbCollection"));
+    } catch (mysqli_sql_exception $exc) {
+		$this->errorMessage = $exc->getMessage();
+    	$this->error = 1;
+    	echo json_encode($this->error());
+    	die();
+	}
+    $this->rows = 0;
+ 	$this->errorMessage = "";
+    $this->error = 0;
+    $this->result = null;
   }
 
   function stringEscape(&$string) {
@@ -28,9 +31,7 @@ class quickDB {
   }
 
   function query($query) {
-
     $this->result = $this->connection->query($query);
-
     if($this->connection->error) {
       $this->result = null;
       $this->error = 1;
@@ -46,37 +47,37 @@ class quickDB {
     return $this;
   }
 
-  function toArray($next = 0)  {
+  function toArray()  {
     $response = array();
     if(!$this->rows) return;
     while($row = $this->result->fetch_assoc()) {
       array_push($response,$row);
     }
-
-    if(!$next) {
-      $this->result->close();
-      $this->end();
-    }
+    $this->result->close();
+    $this->end();
     return $response;
   }
 
 
   function toJSON() {
     $response = array();
-    $response['data'] = $this->toArray(1);
+    $response['data'] = $this->toArray();
     $response['length'] = $this->rows;
     $response['inserted'] = $this->insertedId;
     $response['affected'] = $this->affected;
     $response['error'] = $this->error();
-
-    $this->end();
     return json_encode($response);
   }
 
   function error() {
     $error = array();
     $error['isError'] = $this->error;
-    $error['errorMessage'] = $this->errorMessage;
+    if($this->error) {
+	  	if(Config::read("displayErrorMessages"))
+	    	$error['errorMessage'] = $this->errorMessage;
+	    else
+	   		$error['errorMessage'] = Config::read("safeErrorMessage");
+	}
     return $error;
   }
 
@@ -84,7 +85,4 @@ class quickDB {
       return $this->connection->close();
   }
 }
-
-
-
 ?>

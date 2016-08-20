@@ -23,6 +23,8 @@ class quickDB {
  	$this->errorMessage = "";
     $this->error = 0;
     $this->result = null;
+    $this->insertedId = 0;
+    $this->affected = 0;
   }
 
   function stringEscape(&$string) {
@@ -47,23 +49,26 @@ class quickDB {
     return $this;
   }
 
-  function toArray()  {
+  function toArray($next = 0)  {
     $response = array();
     if(!$this->rows) return;
     while($row = $this->result->fetch_assoc()) {
       array_push($response,$row);
     }
-    $this->result->close();
-    $this->end();
+
+    if(!$next) {
+    	$this->result->close();
+    	$this->end();
+    }
     return $response;
   }
 
 
-  function toJSON() {
+  function toJSON($next = 0) {
     $response = array();
-    $response['data'] = $this->toArray();
+    $response['data'] = $this->toArray($next);
     $response['length'] = $this->rows;
-    $response['inserted'] = $this->insertedId;
+    $response['insertedId'] = $this->insertedId;
     $response['affected'] = $this->affected;
     $response['error'] = $this->error();
     return json_encode($response);
@@ -83,6 +88,13 @@ class quickDB {
 
   function end() {
       return $this->connection->close();
+  }
+
+  function reset() {
+  	$this->rows = 0;
+ 	$this->errorMessage = "";
+    $this->error = 0;
+    $this->result = null;
   }
 }
 ?>

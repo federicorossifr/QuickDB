@@ -20,6 +20,6 @@
 	Config::conf("dbUser","root");  
 	Config::conf("dbPass","");
 	Config::conf("dbCollection","experiments"); //Database name
-	Config::conf("displayErrorMessages",0); //1 will display all error messages, 0 will display message below on
+	Config::conf("displayErrorMessages",1); //1 will display all error messages, 0 will display message below on
 											//error
 	Config::conf("safeErrorMessage","There was an error"); // Error message to display instead of default error 													   // message from mysqli

@@ -38,7 +38,10 @@ class Model extends QuickDB {
 		return $this->query($query)->toJSON(1);
 	}
 
-	function read($keys) {
+	function read($keys = null) {
+		if($keys == null) { //read all
+			return $this->query("SELECT * FROM $this->name")->toJSON(1);
+		}
 		$query = "SELECT * FROM $this->name WHERE";
 		foreach ($this->keys as $index => $key) {
 			$query.= " $key=$keys[$index]"; //need to escape

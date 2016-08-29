@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . "/config.php";
-class quickDB {
+class QuickDB {
 	protected $connection;
 	protected $result;
 	protected $error;

@@ -28,6 +28,7 @@ class Model extends QuickDB {
 		$query_1 = "VALUES (";
 		foreach ($fields as $key => $value) {
 			$query_0.="$key";
+			$this->stringEscape($value);
 			$query_1.="'$value'"; //need to escape
 			if(indexByKey($fields,$key) != count($fields) - 1) {
 				$query_0.= ",";
@@ -44,9 +45,11 @@ class Model extends QuickDB {
 		}
 		$query = "SELECT * FROM $this->name WHERE";
 		foreach ($this->keys as $index => $key) {
+			$this->stringEscape($keys[$index]);
 			$query.= " $key=$keys[$index]"; //need to escape
 			if($index != count($this->keys) - 1) $query.= " AND";
 		}
+
 		return $this->query($query)->toJSON(1);
 	}
 
@@ -60,6 +63,7 @@ class Model extends QuickDB {
 		}
 		$query.= " WHERE";
 		foreach ($this->keys as $index => $key) {
+			$this->stringEscape($keys[$index]);			
 			$query.= " $key=$keys[$index]"; //need to escape
 			if($index != count($this->keys) - 1) $query.= " AND";
 		}
@@ -69,6 +73,7 @@ class Model extends QuickDB {
 	function delete($keys) {
 		$query = "DELETE FROM $this->name WHERE";
 		foreach ($this->keys as $index => $key) {
+			$this->stringEscape($keys[$index]);			
 			$query.= " $key='$keys[$index]'"; //need to escape
 			if($index != count($this->keys) - 1) $query.= " AND";
 		}
@@ -78,6 +83,7 @@ class Model extends QuickDB {
 	function where($fields) {
 		$query = "SELECT * FROM $this->name WHERE";
 		foreach($fields as $key => $value) {
+			$this->stringEscape($value);			
 			$query.= " $key='$value'";
 			if(indexByKey($fields,$key) != count($fields) - 1) {
 				$query.=' AND';

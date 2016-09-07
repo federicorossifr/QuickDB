@@ -28,7 +28,7 @@ class QuickDB {
 	}
 
 	function stringEscape(&$string) {
-		$this->connection->real_escape_string($string);
+		$string = $this->connection->real_escape_string($string);
 		return $string;
 	}
 

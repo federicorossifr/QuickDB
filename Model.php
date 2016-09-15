@@ -23,7 +23,7 @@ class Model extends QuickDB {
 		$this->reset();
 	}
 
-	function create($fields) {
+	function create($fields,$ajax = 0) {
 		$query_0 = "INSERT INTO $this->name(";
 		$query_1 = "VALUES (";
 		foreach ($fields as $key => $value) {
@@ -36,10 +36,13 @@ class Model extends QuickDB {
 			}
 		}
 		$query = $query_0 . ") " . $query_1 . ")";
-		return $this->query($query)->toJSON(1);
+		if($ajax)
+			return $this->query($query)->toJSON(1);
+		else
+			return $this->query($query)->toArray(1);
 	}
 
-	function read($keys = null) {
+	function read($keys = null,$ajax = 0) {
 		if($keys == null) { //read all
 			return $this->query("SELECT * FROM $this->name")->toJSON(1);
 		}
@@ -50,10 +53,13 @@ class Model extends QuickDB {
 			if($index != count($this->keys) - 1) $query.= " AND";
 		}
 
-		return $this->query($query)->toJSON(1);
+		if($ajax)
+			return $this->query($query)->toJSON(1);
+		else
+			return $this->query($query)->toArray(1);
 	}
 
-	function update($keys,$fields) {
+	function update($keys,$fields,$ajax = 0) {
 		$query = "UPDATE $this->name SET";
 		foreach($fields as $key => $value) {
 			$query.= " $key='$value'";
@@ -67,20 +73,26 @@ class Model extends QuickDB {
 			$query.= " $key=$keys[$index]"; //need to escape
 			if($index != count($this->keys) - 1) $query.= " AND";
 		}
-		return $this->query($query)->toJSON(1);
+		if($ajax)
+			return $this->query($query)->toJSON(1);
+		else
+			return $this->query($query)->toArray(1);
 	}
 
-	function delete($keys) {
+	function delete($keys,$ajax = 0) {
 		$query = "DELETE FROM $this->name WHERE";
 		foreach ($this->keys as $index => $key) {
 			$this->stringEscape($keys[$index]);			
 			$query.= " $key='$keys[$index]'"; //need to escape
 			if($index != count($this->keys) - 1) $query.= " AND";
 		}
-		return $this->query($query)->toJSON(1);
+		if($ajax)
+			return $this->query($query)->toJSON(1);
+		else
+			return $this->query($query)->toArray(1);
 	}
 
-	function where($fields) {
+	function where($fields,$ajax = 0) {
 		$query = "SELECT * FROM $this->name WHERE";
 		foreach($fields as $key => $value) {
 			$this->stringEscape($value);			
@@ -89,6 +101,9 @@ class Model extends QuickDB {
 				$query.=' AND';
 			}
 		}
-		return $this->query($query)->toJSON(1);
+		if($ajax)
+			return $this->query($query)->toJSON(1);
+		else
+			return $this->query($query)->toArray(1);
 	}
 }

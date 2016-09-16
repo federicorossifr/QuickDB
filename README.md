@@ -1,4 +1,4 @@
-# phpQuickDB
+# QuickDB
 
 <strong>QuickDB</strong>
 is designed for database connection and querying based on MySQLi with full support for JSON responses.

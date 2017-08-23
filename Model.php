@@ -79,12 +79,14 @@ class Model extends QuickDB {
 			return $this->query($query)->toArray(1);
 	}
 
-	function delete($keys,$ajax = 0) {
+	function delete($fields,$ajax = 0) {
 		$query = "DELETE FROM $this->name WHERE";
-		foreach ($this->keys as $index => $key) {
-			$this->stringEscape($keys[$index]);			
-			$query.= " $key='$keys[$index]'"; //need to escape
-			if($index != count($this->keys) - 1) $query.= " AND";
+		foreach($fields as $key => $value) {
+			$this->stringEscape($value);			
+			$query.= " $key='$value'";
+			if(indexByKey($fields,$key) != count($fields) - 1) {
+				$query.=' AND';
+			}
 		}
 		if($ajax)
 			return $this->query($query)->toJSON(1);
